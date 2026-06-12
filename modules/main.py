@@ -4,6 +4,7 @@ import sys
 import json
 import time
 import asyncio
+import random
 import requests
 import subprocess
 import urllib.parse
@@ -13,13 +14,6 @@ import m3u8
 import core as helper
 from utils import progress_bar
 from vars import API_ID, API_HASH, BOT_TOKEN
-
-# Owner Telegram user ID (set OWNER env var in Render dashboard)
-OWNER = int(os.getenv("OWNER", "0"))
-
-# Webhook & port config (set WEBHOOK=True in env to enable web server)
-WEBHOOK = os.getenv("WEBHOOK", "True").lower() in ("true", "1", "yes")
-PORT = int(os.getenv("PORT", 8000))
 from aiohttp import ClientSession
 from pyromod import listen
 from subprocess import getstatusoutput
@@ -33,11 +27,90 @@ from pyrogram.errors.exceptions.bad_request_400 import StickerEmojiInvalid
 from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-# ── Live-changeable API endpoints (owner can update via /changeapi) ──────────
-# Both PWAPI1 and PWAPI2 always stay in sync — use /changeapi to update both
-PWAPI1 = "https://anonymouspwplayer-ce3f42358cca.herokuapp.com/pw"
-PWAPI2 = "https://anonymouspwplayer-ce3f42358cca.herokuapp.com/pw"
-# ───────────────────────────────────────────────────────────
+# ── Owner ID (update this with your actual owner Telegram ID) ────────────────
+OWNER_ID = int(os.environ.get("OWNER_ID", "0"))
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Live-changeable PW API endpoints (/changeapi command updates both) ───────
+PWAPI1 = os.environ.get("PWAPI1", "https://anonymouspwplayerrr-31d6706c7a3b.herokuapp.com/pw")
+PWAPI2 = os.environ.get("PWAPI2", "https://anonymouspwplayerrr-31d6706c7a3b.herokuapp.com/pw")
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Persistent Auth Users (JSON-backed, survives bot restart) ────────────────
+AUTH_FILE = "auth_users.json"
+
+def _load_auth_users():
+    try:
+        with open(AUTH_FILE, "r") as f:
+            return set(json.load(f))
+    except Exception:
+        return set()
+
+def _save_auth_users(users: set):
+    try:
+        with open(AUTH_FILE, "w") as f:
+            json.dump(list(users), f)
+    except Exception:
+        pass
+
+auth_users: set = _load_auth_users()
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Persistent Broadcast Users (JSON-backed, survives bot restart) ───────────
+BROADCAST_FILE = "broadcast_users.json"
+
+def _load_broadcast_users():
+    try:
+        with open(BROADCAST_FILE, "r") as f:
+            return set(json.load(f))
+    except Exception:
+        return set()
+
+def _save_broadcast_users(users: set):
+    try:
+        with open(BROADCAST_FILE, "w") as f:
+            json.dump(list(users), f)
+    except Exception:
+        pass
+
+broadcast_users: set = _load_broadcast_users()
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Random image list ────────────────────────────────────────────────────────
+image_list = [
+    "https://graph.org/file/41f315a54e91963176271-084a885105ba946f5e.jpg",
+    "https://graph.org/file/e45d8d37be0c22a9cbbfa-3f2796849a1b13643a.jpg",
+    "https://graph.org/file/2d3ba7771a207e4ab33aa-272463dad4b5338502.jpg",
+    "https://graph.org/file/97d3d6a3c21bc9bdfa000-748da0a998885a9aaa.jpg",
+    "https://graph.org/file/b90ad7792c1d6b1b0d0ad-22be3904ec15293242.jpg",
+    "https://graph.org/file/b2d5f4c1abab45da76a80-699357bf49c4bbb721.jpg",
+    "https://graph.org/file/7fcefd140feafb524a0f6-0172a531df2ac35c9c.jpg",
+]
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Failed/Skipped download notice ───────────────────────────────────────────
+async def send_failed_notice(bot, chat_id, vid_id, title, url, reason):
+    """Send a formatted failed-download notice message."""
+    msg = (
+        "**🥺𝐒𝐨𝐫𝐫𝐲 𝐢 𝐜𝐚𝐧'𝐭 𝐚𝐛𝐥𝐞 𝐭𝐨 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝 𝐭𝐡𝐢𝐬:**\n\n"
+        + "** 🖲️𝐕𝐈𝐃_𝐈𝐃:** `" + str(vid_id).zfill(3) + "`\n\n"
+        + "**📝 𝐓𝐢𝐭𝐥𝐞:** " + str(title) + "\n\n"
+        + "**𝐔𝐑𝐋:** " + str(url) + "\n\n"
+        + "**𝐑𝐞𝐚𝐬𝐨𝐧:** `" + str(reason) + "`\n\n"
+        + "__𝐈𝐟 𝐲𝐨𝐮 𝐭𝐡𝐢𝐧𝐤 𝐢𝐭'𝐬 𝐒𝐡𝐨𝐮𝐥𝐝 𝐛𝐞 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐝 𝐬𝐨 𝐜𝐨𝐧𝐭𝐚𝐜𝐭 𝐭𝐨 𝐎𝐰𝐧𝐞𝐫.__"
+    )
+    try:
+        await bot.send_message(
+            chat_id,
+            msg,
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton(text="👑𝐎𝐖𝐍𝐄𝐑", url="https://t.me/SunilChoudhary08")]
+            ])
+        )
+    except Exception as e:
+        print(f"send_failed_notice error: {e}")
+# ─────────────────────────────────────────────────────────────────────────────
 
 # Initialize the bot
 bot = Client(
@@ -47,7 +120,7 @@ bot = Client(
     bot_token=BOT_TOKEN
 )
 
-my_name = "MS"
+my_name = "SK"
 
 cookies_file_path = os.getenv("COOKIES_FILE_PATH", "/modules/youtube_cookies.txt")
 
@@ -63,19 +136,32 @@ async def web_server():
     web_app.add_routes(routes)
     return web_app
 
+async def start_bot():
+    await bot.start()
+    print("Bot is up and running")
 
-def _is_port_in_use(port: int) -> bool:
-    """Check if a TCP port is already bound on 0.0.0.0 or 127.0.0.1."""
-    import socket
-    for host in ("0.0.0.0", "127.0.0.1"):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            try:
-                s.bind((host, port))
-            except OSError:
-                return True
-    return False
+async def stop_bot():
+    await bot.stop()
 
+async def main():
+    if WEBHOOK:
+        # Start the web server
+        app_runner = web.AppRunner(await web_server())
+        await app_runner.setup()
+        site = web.TCPSite(app_runner, "0.0.0.0", PORT)
+        await site.start()
+        print(f"Web server started on port {PORT}")
+
+    # Start the bot
+    await start_bot()
+
+    # Keep the program running
+    try:
+        while True:
+            await bot.polling()  # Run forever, or until interrupted
+    except (KeyboardInterrupt, SystemExit):
+        await stop_bot()
+    
 
 async def start_bot():
     await bot.start()
@@ -85,57 +171,27 @@ async def stop_bot():
     await bot.stop()
 
 async def main():
-    app_runner = None
-
     if WEBHOOK:
-        # ── Port conflict guard ──────────────────────────────────────────────
-        # Render injects PORT=10000; gunicorn (if used) already owns that port.
-        # We try PORT first, then PORT+1, then a fixed fallback (8080).
-        candidate_ports = [PORT, PORT + 1, 8080, 8443]
-        chosen_port = None
-        for p in candidate_ports:
-            if not _is_port_in_use(p):
-                chosen_port = p
-                break
-
-        if chosen_port is None:
-            print(
-                f"[WARN] All candidate ports {candidate_ports} are in use. "
-                "Skipping aiohttp web server — bot-only mode."
-            )
-        else:
-            try:
-                app_runner = web.AppRunner(await web_server())
-                await app_runner.setup()
-                site = web.TCPSite(app_runner, "0.0.0.0", chosen_port)
-                await site.start()
-                print(f"[INFO] Web server started on port {chosen_port}")
-            except OSError as exc:
-                # Last-resort safety net — log and continue without web server
-                print(f"[WARN] Could not bind web server: {exc}. Running bot-only.")
-                if app_runner is not None:
-                    await app_runner.cleanup()
-                    app_runner = None
+        # Start the web server
+        app_runner = web.AppRunner(await web_server())
+        await app_runner.setup()
+        site = web.TCPSite(app_runner, "0.0.0.0", PORT)
+        await site.start()
+        print(f"Web server started on port {PORT}")
 
     # Start the bot
     await start_bot()
 
-    # Keep the program running using pyrogram's idle()
-    # idle() properly handles SIGINT/SIGTERM and keeps the dispatcher alive
+    # Keep the program running
     try:
-        from pyrogram.idle import idle
-        await idle()
+        while True:
+            await asyncio.sleep(3600)  # Run forever, or until interrupted
     except (KeyboardInterrupt, SystemExit):
-        pass
-    finally:
         await stop_bot()
-        if app_runner is not None:
-            await app_runner.cleanup()
-            print("[INFO] Web server shut down cleanly.")
         
 class Data:
     START = (
-        "🌟 Welcome Dear🧸😘 {0}!🌟\n\n"
+        "🌟 Welcome dear 🌚💥 {0}! 🌟\n\n"
     )
 # Define the start command handler
 @bot.on_message(filters.command("start"))
@@ -150,52 +206,180 @@ async def start(client: Client, msg: Message):
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Initializing Uploader bot...😚🤖\n\n"
+        "Initializing Uploader bot... 🤖\n\n"
         "Progress: [⬜⬜⬜⬜⬜⬜⬜⬜⬜] 0%\n\n"
     )
 
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Loading features...😗⏳\n\n"
+        "Loading features... ⏳\n\n"
         "Progress: [🟥🟥🟥⬜⬜⬜⬜⬜⬜] 25%\n\n"
     )
     
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "This may take a moment, sit back and relax!🫣💪\n\n"
+        "This may take a moment, sit back and relax! 🥵\n\n"
         "Progress: [🟧🟧🟧🟧🟧⬜⬜⬜⬜] 50%\n\n"
     )
 
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Checking Bot Status...😙🔍\n\n"
+        "Checking Bot Status... 🔍\n\n"
         "Progress: [🟨🟨🟨🟨🟨🟨🟨⬜⬜] 75%\n\n"
     )
 
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Checking status Okay... Command is Private Dear🫂.**Bot Made BY @SmartBoy_ApnaMS**🔍\n\n"
+        "Checking status Okay... Command is Private Dear.🌚**Bot Made BY @SunilChoudhary08**🔍\n\n"
         "Progress:[🟩🟩🟩🟩🟩🟩🟩🟩🟩] 100%\n\n"
     )
 
+    # ── Register user for broadcast ───────────────────────────────────────────
+    broadcast_users.add(msg.chat.id)
+    _save_broadcast_users(broadcast_users)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    # ── Send random welcome image ─────────────────────────────────────────────
+    try:
+        await client.send_photo(chat_id=msg.chat.id, photo=random.choice(image_list))
+    except Exception:
+        pass
+    # ─────────────────────────────────────────────────────────────────────────
+
 @bot.on_message(filters.command(["stop"]) )
 async def restart_handler(_, m):
-    await m.reply_text("⚪**WORK IS STOPPED**🔵", True)
+    await m.reply_text("♥️**STOPPED**♥️", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
+# ══════════════════════════════════════════════════════════════════════════════
+# ── AUTH SYSTEM (Owner only — JSON-backed, survives restarts) ────────────────
+# ══════════════════════════════════════════════════════════════════════════════
 
-@bot.on_message(filters.command(["Teddy"]) )
+@bot.on_message(filters.command(["addauth"]))
+async def addauth_handler(client: Client, m: Message):
+    if m.from_user.id != OWNER_ID:
+        return await m.reply_text("❌ Only owner can use this command.")
+    parts = m.text.split()
+    if len(parts) < 2:
+        return await m.reply_text("Usage: `/addauth <user_id>`")
+    try:
+        uid = int(parts[1])
+    except ValueError:
+        return await m.reply_text("❌ Invalid user ID.")
+    auth_users.add(uid)
+    _save_auth_users(auth_users)
+    await m.reply_text(f"✅ User `{uid}` added to authorized list.\n💾 Saved to JSON.")
+
+@bot.on_message(filters.command(["rmauth"]))
+async def rmauth_handler(client: Client, m: Message):
+    if m.from_user.id != OWNER_ID:
+        return await m.reply_text("❌ Only owner can use this command.")
+    parts = m.text.split()
+    if len(parts) < 2:
+        return await m.reply_text("Usage: `/rmauth <user_id>`")
+    try:
+        uid = int(parts[1])
+    except ValueError:
+        return await m.reply_text("❌ Invalid user ID.")
+    auth_users.discard(uid)
+    _save_auth_users(auth_users)
+    await m.reply_text(f"✅ User `{uid}` removed from authorized list.\n💾 Saved to JSON.")
+
+@bot.on_message(filters.command(["users"]))
+async def allusers_handler(client: Client, m: Message):
+    if m.from_user.id != OWNER_ID:
+        return await m.reply_text("❌ Only owner can use this command.")
+    if not auth_users:
+        return await m.reply_text("📋 No authorized users yet.")
+    user_list = "\n".join([f"• `{uid}`" for uid in auth_users])
+    await m.reply_text(f"👥 **Authorized Users ({len(auth_users)}):**\n\n{user_list}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ── BROADCAST SYSTEM (Owner only — JSON-backed) ───────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+
+@bot.on_message(filters.command(["broadcast"]))
+async def broadcast_handler(client: Client, m: Message):
+    if m.from_user.id != OWNER_ID:
+        return await m.reply_text("❌ Only owner can use this command.")
+    if not m.reply_to_message:
+        return await m.reply_text("📢 Reply to a message to broadcast it.")
+    
+    total = len(broadcast_users)
+    if total == 0:
+        return await m.reply_text("No users to broadcast to yet.")
+    
+    status = await m.reply_text(f"📢 Broadcasting to {total} users...")
+    success, failed = 0, 0
+    for uid in list(broadcast_users):
+        try:
+            await m.reply_to_message.copy(uid)
+            success += 1
+            await asyncio.sleep(0.05)  # flood prevention
+        except Exception:
+            failed += 1
+    await status.edit_text(
+        f"📢 **Broadcast Complete!**\n\n"
+        f"✅ Success: {success}\n"
+        f"❌ Failed: {failed}\n"
+        f"👥 Total: {total}"
+    )
+
+@bot.on_message(filters.command(["broadusers"]))
+async def broadusers_handler(client: Client, m: Message):
+    if m.from_user.id != OWNER_ID:
+        return await m.reply_text("❌ Only owner can use this command.")
+    total = len(broadcast_users)
+    if total == 0:
+        return await m.reply_text("📋 No broadcast users registered yet.")
+    uid_list = "\n".join([f"• `{uid}`" for uid in list(broadcast_users)[:50]])
+    suffix = f"\n\n...and {total - 50} more." if total > 50 else ""
+    await m.reply_text(f"👥 **Broadcast Users ({total}):**\n\n{uid_list}{suffix}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ── /changeapi COMMAND (Owner only — updates PWAPI1 & PWAPI2 live) ────────────
+# ══════════════════════════════════════════════════════════════════════════════
+
+@bot.on_message(filters.command(["changeapi"]))
+async def changeapi_handler(client: Client, m: Message):
+    global PWAPI1, PWAPI2
+    if m.from_user.id != OWNER_ID:
+        return await m.reply_text(
+            "To change your Api in your Repository in this format👇🏻.\n\n"
+            "/changeapi New Api Here\n**https... to .com/pw** tak Only😁.\n\n"
+            "But But But🫡\n"
+            "Sorry you are not my owner😒."
+        )
+    parts = m.text.split(None, 1)
+    if len(parts) < 2 or not parts[1].strip():
+        return await m.reply_text(
+            "Welcome Boss! Change your API in this format:\n\n"
+            "/changeapi New Api Here\n**https... to .com/pw** tak Only😁.\n\n"
+            "Send me and I will change it.✨"
+        )
+    new_api = parts[1].strip()
+    PWAPI1 = new_api
+    PWAPI2 = new_api
+    await m.reply_text(
+        f"**💕𝐀𝐩𝐢 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 𝐂𝐡𝐚𝐧𝐠𝐞𝐝!**\n\n"
+        f"🔗 **𝐍𝐞𝐰 𝐀𝐩𝐢:**\n`{PWAPI1}`\n\n"
+        f"⚡ 𝐂𝐡𝐚𝐧𝐠𝐞𝐝 𝐋𝐢𝐯𝐞 𝐍𝐨𝐰 — 𝐍𝐨 𝐁𝐨𝐭 𝐫𝐞𝐬𝐭𝐚𝐫𝐭 𝐧𝐞𝐞𝐝𝐞𝐝 𝐔𝐬𝐞 𝐍𝐨𝐰🚀."
+    )
+
+# ══════════════════════════════════════════════════════════════════════════════
+
+@bot.on_message(filters.command(["The08"]) )
 async def txt_handler(bot: Client, m: Message):
-    editable = await m.reply_text(f"**🔹Hi I am Poweful Sweet TXT Downloader📥 Bot.**\n🔹**Send me the TXT file and Just wait and Watch💸.**")
+    editable = await m.reply_text(f"**🔹Hi I am Poweful Lovely TXT Downloader📥 Bot.**\n🔹**Send me the TXT file and Just wait and Watch😚.**")
     input: Message = await bot.listen(editable.chat.id)
     x = await input.download()
     await input.delete(True)
     file_name, ext = os.path.splitext(os.path.basename(x))
-    credit = f"@SmartBoy_ApnaMS"
+    credit = f"@SunilChoudhary08"
     token = f"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzYxNTE3MzAuMTI2LCJkYXRhIjp7Il9pZCI6IjYzMDRjMmY3Yzc5NjBlMDAxODAwNDQ4NyIsInVzZXJuYW1lIjoiNzc2MTAxNzc3MCIsImZpcnN0TmFtZSI6IkplZXYgbmFyYXlhbiIsImxhc3ROYW1lIjoic2FoIiwib3JnYW5pemF0aW9uIjp7Il9pZCI6IjVlYjM5M2VlOTVmYWI3NDY4YTc5ZDE4OSIsIndlYnNpdGUiOiJwaHlzaWNzd2FsbGFoLmNvbSIsIm5hbWUiOiJQaHlzaWNzd2FsbGFoIn0sImVtYWlsIjoiV1dXLkpFRVZOQVJBWUFOU0FIQEdNQUlMLkNPTSIsInJvbGVzIjpbIjViMjdiZDk2NTg0MmY5NTBhNzc4YzZlZiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTczNTU0NjkzMH0.iImf90mFu_cI-xINBv4t0jVz-rWK1zeXOIwIFvkrS0M"
     try:    
         with open(x, "r") as f:
@@ -206,11 +390,11 @@ async def txt_handler(bot: Client, m: Message):
             links.append(i.split("://", 1))
         os.remove(x)
     except:
-        await m.reply_text("Are yaar **txt** file Bhejni thi \n\n **Chal koi na tap on** /Teddy **Or*   /Bear **then** \n\n **resend txt file to me again🫂.**")
+        await m.reply_text("Hello darling.🌚🤣")
         os.remove(x)
         return
    
-    await editable.edit(f"Total links found are **{len(links)}**\n\nSend From where you want to download🙄 initial is **1**")
+    await editable.edit(f"Total links found are **{len(links)}**\n\nSend From where you want to download🤔 initial is **1**")
     input0: Message = await bot.listen(editable.chat.id)
     raw_text = input0.text
     await input0.delete(True)
@@ -218,16 +402,16 @@ async def txt_handler(bot: Client, m: Message):
         arg = int(raw_text)
     except:
         arg = 1
-    await editable.edit("**Enter Your 𝗕𝗮𝘁𝗰𝗵 Name or send '/mahi' for extracting name from your text filename🧐.**")
+    await editable.edit("**Enter Your Batch Name or send '/up' for grabing from text filename.😉**")
     input1: Message = await bot.listen(editable.chat.id)
     raw_text0 = input1.text
     await input1.delete(True)
-    if raw_text0 == '/mahi':
+    if raw_text0 == '/up':
         b_name = file_name
     else:
         b_name = raw_text0
 
-    await editable.edit("**Enter resolution.\n Eg : 144, 250, 360, 480, 720 or 1080😚.**")
+    await editable.edit("**Enter resolution.\n Eg : 144, 250, 360, 480, 720 or 1080😚**")
     input2: Message = await bot.listen(editable.chat.id)
     raw_text2 = input2.text
     await input2.delete(True)
@@ -249,20 +433,20 @@ async def txt_handler(bot: Client, m: Message):
     except Exception:
             res = "UN"
     
-    await editable.edit("**Enter Your 𝙉𝙖𝙢𝙚 or send '/Cutie' for use default🥂.**\n**For an Example**:\n @SmartBoy_ApnaMS")
+    await editable.edit("**Enter Your Name or send '/SK' for use default.🌚\n Eg :@SunilChoudhary08 **")
     input3: Message = await bot.listen(editable.chat.id)
     raw_text3 = input3.text
     await input3.delete(True)
-    if raw_text3 == '/Cutie':
+    if raw_text3 == '/SK':
         CR = credit
     else:
         CR = raw_text3
         
-    await editable.edit("**Enter Your PW 𝗧𝗼𝗸𝗲𝗻 For 𝐌𝐏𝐃 𝐔𝐑𝐋 or send '/vip' for use default🫣**")
+    await editable.edit("**Enter Your PW Token For 𝐌𝐏𝐃 𝐔𝐑𝐋  or send '/SK' for use default🎀**")
     input4: Message = await bot.listen(editable.chat.id)
     raw_text4 = input4.text
     await input4.delete(True)
-    if raw_text4 == '/vip':
+    if raw_text4 == '/SK':
         MR = token
     else:
         MR = raw_text4
@@ -311,10 +495,10 @@ async def txt_handler(bot: Client, m: Message):
              #url = f"https://player.muftukmall.site/?id={id}"
             #elif '/master.mpd' in url:
              #id =  url.split("/")[-2]
-             #url = f"{PWAPI2}?url={url}?token={raw_text4}"
+             #url = f"https://anonymouspwplayerrr-31d6706c7a3b.herokuapp.com/pw?url={url}?token={raw_text4}"
             #url = f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8?token={raw_text4}"
-            elif "d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
-             url = f"{PWAPI2}?url={url}&token={raw_text4}"
+            elif"d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
+             url = f"{PWAPI1}?url={url}&token={raw_text4}"
                      
                                                          
             name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
@@ -341,8 +525,8 @@ async def txt_handler(bot: Client, m: Message):
 
             try:  
                 
-                cc = f'**📹 VID_ID: {str(count).zfill(3)}.\n\n📒 Title: {name1} {res}.mkv\n\n<pre><code>📚 Batch Name: {b_name}</code></pre>\n\n📥 Extracted By𓆩♛𓆪 : \n{CR}\n\n**∘𒆜━━━❀💚𝐌𝐒❤️❀━━━𒆜**'
-                cc1 = f'**🗃️ PDF_ID: {str(count).zfill(3)}.\n\n📒 Title: {name1} .pdf\n\n<pre><code>📚 Batch Name: {b_name}</code></pre>\n\n📥 Extracted By𓆩♛𓆪 : \n{CR}\n\n**∘𒆜━━━❀💙𝐌𝐒💜❀━━━𒆜∘**'
+                cc = f'**📹 VID_ID: {str(count).zfill(3)}.\n\n📝 Title: {name1} {res}.mkv\n\n<pre><code>📚 Batch Name: {b_name}</code></pre>\n\n📥 Extracted By♠ : {CR}\n\n**👑━━━🤍 𝑻𝒉𝒆 𝑺𝑲 🤍━━━👑**'
+                cc1 = f'**💾 PDF_ID: {str(count).zfill(3)}.\n\n📝 Title: {name1} .pdf\n\n<pre><code>📚 Batch Name: {b_name}</code></pre>\n\n📥 Extracted By♠ : {CR}\n\n**👑━━━🤍 𝑻𝒉𝒆 𝑺𝑲 🤍━━━👑**'
                     
                 
                 if "drive" in url:
@@ -404,7 +588,7 @@ async def txt_handler(bot: Client, m: Message):
                         continue                       
                           
                 else:
-                    Show = f"✰🖥️ 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐢𝐧𝐠 𝗪𝗮𝗶𝘁..🤖🚀 »\n\n📝 Title:- `{name}\n\n📹 𝐐𝐮𝐥𝐢𝐭𝐲 » {raw_text2}`\n\n**🔗 𝐔𝐑𝐋 »** `{url}`\n\n**𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲🧸: ✦ @SmartBoy_ApnaMS ❖"
+                    Show = f"✰🖥️ 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐢𝐧𝐠 𝗪𝗮𝗶𝘁..🤖🚀 »\n\n📝 Title:- `{name}\n\n📹 𝐐𝐮𝐥𝐢𝐭𝐲 » {raw_text2}`\n\n**🔗 𝐔𝐑𝐋 »** `{url}`\n\n**𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲🧸: ✦ @SunilChoudhary08 ❖"
                     prog = await m.reply_text(Show)
                     res_file = await helper.download_video(url, cmd, name)
                     filename = res_file
@@ -414,25 +598,23 @@ async def txt_handler(bot: Client, m: Message):
                     time.sleep(1)
 
             except Exception as e:
-                await m.reply_text(
-                    f"⌘✰𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐢𝐧𝐠 𝗙𝗮𝗶𝗹𝗲𝗱⛔😒\n\n⌘ 𝐍𝐚𝐦𝐞🌟 » {name}\n⌘ 𝐋𝐢𝐧𝐤🖥️ » `{url}`"
-                )
+                await send_failed_notice(bot, m.chat.id, count, name, url, str(e))
                 continue
 
     except Exception as e:
         await m.reply_text(e)
-    await m.reply_text( "𝙀𝙑𝙀𝙍𝙔𝙏𝙃𝙄𝙉𝙂 𝙄𝙎 𝘿𝙊𝙉𝙀  𝘿𝙊𝙉𝙀 \n\n**NOW TIME FOR REACTIONS✅** \n\n**Reaction nahi de rhe ho Sharam karo thodi Paap lagega Paap😂**")
+    await m.reply_text("𝐀𝐋𝐋 𝐃𝐎𝐍𝐄 Reaction khud de doge ya kahna padega ✅🔸")
 
 # Advance
 
-@bot.on_message(filters.command(["Bear"]) )
-async def bear_handler(bot: Client, m: Message):
-    editable = await m.reply_text(f"**🔹Hi I am Poweful Lovely TXT Downloader📥 Bot.**\n🔹**Send me the TXT file and Just wait and Watch🥂.**")
+@bot.on_message(filters.command(["The08"]) )
+async def txt_handler(bot: Client, m: Message):
+    editable = await m.reply_text(f"**🔹Hi I am Poweful Lovely TXT Downloader📥 Bot.**\n🔹**Send me the TXT file and Just wait and Watch🥵.**")
     input: Message = await bot.listen(editable.chat.id)
     x = await input.download()
     await input.delete(True)
     file_name, ext = os.path.splitext(os.path.basename(x))
-    credit = f"@SmartBoy_ApnaMS"
+    credit = f"@SunilChoudhary08"
     token = f"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzYxNTE3MzAuMTI2LCJkYXRhIjp7Il9pZCI6IjYzMDRjMmY3Yzc5NjBlMDAxODAwNDQ4NyIsInVzZXJuYW1lIjoiNzc2MTAxNzc3MCIsImZpcnN0TmFtZSI6IkplZXYgbmFyYXlhbiIsImxhc3ROYW1lIjoic2FoIiwib3JnYW5pemF0aW9uIjp7Il9pZCI6IjVlYjM5M2VlOTVmYWI3NDY4YTc5ZDE4OSIsIndlYnNpdGUiOiJwaHlzaWNzd2FsbGFoLmNvbSIsIm5hbWUiOiJQaHlzaWNzd2FsbGFoIn0sImVtYWlsIjoiV1dXLkpFRVZOQVJBWUFOU0FIQEdNQUlMLkNPTSIsInJvbGVzIjpbIjViMjdiZDk2NTg0MmY5NTBhNzc4YzZlZiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTczNTU0NjkzMH0.iImf90mFu_cI-xINBv4t0jVz-rWK1zeXOIwIFvkrS0M"
     try:    
         with open(x, "r") as f:
@@ -443,11 +625,11 @@ async def bear_handler(bot: Client, m: Message):
             links.append(i.split("://", 1))
         os.remove(x)
     except:
-        await m.reply_text("Are yaar **txt** file Bhejni thi \n\n **Chal koi na tap on** /Teddy **Or*    /Bear **then** \n\n **resend txt file to me again🫂.**")
+        await m.reply_text("Hii Cutie.🌚😘")
         os.remove(x)
         return
    
-    await editable.edit(f"Total links found are **{len(links)}**\n\nSend From where you want to download🧐 initial is **1**")
+    await editable.edit(f"Total links found are **{len(links)}**\n\nSend From where you want to download🤔 initial is **1**")
     input0: Message = await bot.listen(editable.chat.id)
     raw_text = input0.text
     await input0.delete(True)
@@ -455,16 +637,16 @@ async def bear_handler(bot: Client, m: Message):
         arg = int(raw_text)
     except:
         arg = 1
-    await editable.edit("**Enter Your 𝗕𝗮𝘁𝗰𝗵 Name or send '/mahi' for extracting Name from your text filename😚.**")
+    await editable.edit("**Enter Your Batch Name or send '/SK' for grabing from text filename.🌚**")
     input1: Message = await bot.listen(editable.chat.id)
     raw_text0 = input1.text
     await input1.delete(True)
-    if raw_text0 == '/mahi':
+    if raw_text0 == '/SK':
         b_name = file_name
     else:
         b_name = raw_text0
 
-    await editable.edit("**Enter resolution.**\n Eg : 144, 240, 360, **480**, 720 or 1080😄.")
+    await editable.edit("**Enter resolution.\n Eg : 144, 240, 360, 480, 720 or 1080😚**")
     input2: Message = await bot.listen(editable.chat.id)
     raw_text2 = input2.text
     await input2.delete(True)
@@ -486,24 +668,16 @@ async def bear_handler(bot: Client, m: Message):
     except Exception:
             res = "UN"
     
-    await editable.edit("**Enter Your 𝙉𝙖𝙢𝙚 or send '/Love'for use default🥂.**\n**For an Example**:\n @SmartBoy_ApnaMS")
+    await editable.edit("**Enter Your Name or send '/SK' for use default.😗\n Eg : @SunilChoudhary08**")
     input3: Message = await bot.listen(editable.chat.id)
     raw_text3 = input3.text
     await input3.delete(True)
-    if raw_text3 == '/Love':
+    if raw_text3 == '/SK':
         CR = credit
     else:
         CR = raw_text3
         
-    await editable.edit("**Enter Your PW 𝗧𝗼𝗸𝗲𝗻 For 𝐌𝐏𝐃 𝐔𝐑𝐋 or send '/vip' for use default**")
-    input4: Message = await bot.listen(editable.chat.id)
-    raw_text4 = input4.text
-    await input4.delete(True)
-    if raw_text4 == '/vip':
-        MR = token
-    else:
-        MR = raw_text4
-        
+       
     await editable.edit("Now send the **Thumb url**\n**Eg Who's End With .jpg:** ``\n\nor Send `no`")
     input6 = message = await bot.listen(editable.chat.id)
     raw_text6 = input6.text
@@ -542,18 +716,6 @@ async def bear_handler(bot: Client, m: Message):
             elif 'videos.classplusapp' in url or "tencdn.classplusapp" in url or "webvideos.classplusapp.com" in url or "media-cdn-alisg.classplusapp.com" in url or "videos.classplusapp" in url or "videos.classplusapp.com" in url or "media-cdn-a.classplusapp" in url or "media-cdn.classplusapp" in url:
              url = requests.get(f'https://api.classplusapp.com/cams/uploader/video/jw-signed-url?url={url}', headers={'x-access-token': 'eyJjb3Vyc2VJZCI6IjQ1NjY4NyIsInR1dG9ySWQiOm51bGwsIm9yZ0lkIjo0ODA2MTksImNhdGVnb3J5SWQiOm51bGx9r'}).json()['url']
 
-
-            #elif '/master.mpd' in url:
-             #id =  url.split("/")[-2]
-             #url = f"https://player.muftukmall.site/?id={id}"
-            #elif '/master.mpd' in url:
-             #id =  url.split("/")[-2]
-             #url = f"{PWAPI2}?url={url}?token={raw_text4}"
-            #url = f"https://madxapi-d0cbf6ac738c.herokuapp.com/{id}/master.m3u8?token={raw_text4}"
-            elif"d1d34p8vz63oiq" in url or "sec1.pw.live" in url:
-             url = f"{PWAPI2}?url={url}&token={raw_text4}"
-                
-           
             elif "apps-s3-jw-prod.utkarshapp.com" in url:
                 if 'enc_plain_mp4' in url:
                     url = url.replace(url.split("/")[-1], res+'.mp4')
@@ -569,7 +731,7 @@ async def bear_handler(bot: Client, m: Message):
                     
             elif '/master.mpd' in url:
              vid_id =  url.split("/")[-2]
-             url =  f"https://pw-url-api-v1mf.onrender.com/process?v=https://sec1.pw.live/{vid_id}/master.mpd&quality={raw_text2}"
+             url =  f"{PWAPI2}?url=https://sec1.pw.live/{vid_id}/master.mpd&quality={raw_text2}"
 
             name1 = links[i][0].replace("\t", "").replace(":", "").replace("/", "").replace("+", "").replace("#", "").replace("|", "").replace("@", "").replace("*", "").replace(".", "").replace("https", "").replace("http", "").strip()
             name = f'{str(count).zfill(3)}) {name1[:60]} {my_name}'
@@ -595,8 +757,8 @@ async def bear_handler(bot: Client, m: Message):
 
             try:  
         
-                cc = f'**📹 VID_ID: {str(count).zfill(3)}.\n\n📒 Title: {name1} {res}.mkv\n\n<pre><code>📚 Batch Name: {b_name}</code></pre>\n\n📥 Extracted By𓆩♛𓆪 : \n{CR}\n\n**∘𒆜━━━❀💚𝐌𝐒❤️❀━━━𒆜∘**'
-                cc1 = f'**🗃️ PDF_ID: {str(count).zfill(3)}.\n\n📒 Title: {name1} .pdf\n\n<pre><code>📚 Batch Name: {b_name}</code></pre>\n\n📥 Extracted By𓆩♛𓆪 : \n{CR}\n\n**∘𒆜━━━❀💙𝐌𝐒💛❀━━━𒆜∘**'
+                cc = f'**📹 VID_ID: {str(count).zfill(3)}.\n\nTitle: {name1} STUDENTS💛{res}.mkv\n\n📚 Batch Name: {b_name}\n\n📥 Extracted By♠ : {CR}\n\n**👑━━━🤍 𝑻𝒉𝒆 𝑺𝑲 🤍━━━👑**'
+                cc1 = f'**💾 PDF_ID: {str(count).zfill(3)}.\n\nTitle: {name1} STUDENTS💛.pdf\n\n📚 Batch Name: {b_name}\n\n📥 Extracted By♠ : {CR}\n\n**👑━━━🤍 𝑻𝒉𝒆 𝑺𝑲 🤍━━━👑**'
                     
                 
                 if "drive" in url:
@@ -658,7 +820,7 @@ async def bear_handler(bot: Client, m: Message):
                         continue                       
                           
                 else:
-                    Show = f"✰🖥️𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐢𝐧𝐠 𝗪𝗮𝗶𝘁..🤖🚀»\n\n📝 Title:- `{name}\n\n🖥️ 𝐐𝐮𝐥𝐢𝐭𝐲 » {raw_text2}`\n\n**🔗 𝐔𝐑𝐋 »** `{url}`\n\n**𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲🧸: ✦ @SmartBoy_ApnaMS✰"
+                    Show = f"✰🖥️𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐢𝐧𝐠 𝗪𝗮𝗶𝘁..🤖🚀»\n\n📝 Title:- `{name}\n\n🖥️ 𝐐𝐮𝐥𝐢𝐭𝐲 » {raw_text2}`\n\n**🔗 𝐔𝐑𝐋 »** `{url}`\n\n**𝐁𝐨𝐭 𝐌𝐚𝐝𝐞 𝐁𝐲🧸: ✦ @SunilChoudhary08✰"
                     prog = await m.reply_text(Show)
                     res_file = await helper.download_video(url, cmd, name)
                     filename = res_file
@@ -668,61 +830,15 @@ async def bear_handler(bot: Client, m: Message):
                     time.sleep(1)
 
             except Exception as e:
-                await m.reply_text(
-                    f"⌘ 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐢𝐧𝐠 𝗙𝗮𝗶𝗹𝗲𝗱⛔😒\n\n⌘ 𝐍𝐚𝐦𝐞🌟 » {name}\n⌘ 𝐋𝐢𝐧𝐤 » `{url}`"
-                )
+                await send_failed_notice(bot, m.chat.id, count, name, url, str(e))
                 continue
 
     except Exception as e:
         await m.reply_text(e)
-    await m.reply_text("𝙀𝙑𝙀𝙍𝙔𝙏𝙃𝙄𝙉𝙂 𝙄𝙎 𝘿𝙊𝙉𝙀  𝘿𝙊𝙉𝙀 \n\n**NOW TIME FOR REACTIONS✅** \n\n**Reaction nahi de rhe ho Sharam karo thodi Paap lagega Paap😂**")
-
-# ─────────────────────────────────────────────────────────────────────────────
-
-# ── /owner command ─────────────────────────────────────────────────────────────
-@bot.on_message(filters.command("owner") & filters.private)
-async def owner_handler(client: Client, msg: Message):
-    owner_text = (
-        "┌──────────────────────────┐\n"
-        "**▪️Owner id Dead. ▪️**\n"
-        "└──────────────────────────┘\n\n"
-    )
-    await msg.reply_text(owner_text)
+    await m.reply_text("𝐀𝐋𝐋 𝐃𝐎𝐍𝐄 REACTIONS khud doge ya kahna padega .✅🔸")
 
 
-# ── /changeapi command (owner only) ───────────────────────────────────────
-# Usage: /changeapi https://new-api.example.com/pw
-# Updates both PWAPI1 and PWAPI2 at once (they always use the same API)
-@bot.on_message(filters.command("changeapi") & filters.private)
-async def changeapi_handler(client: Client, msg: Message):
-    global PWAPI1, PWAPI2
-    if msg.from_user.id != OWNER:
-        return await msg.reply_text(
-            "To change your Api in your Repository in this format👇🏻.\n\n"
-            "/changeapi New Api Here\n**https... to .com/pw** tak Only😁.\n\n"
-            "But But But🫡\n"
-            "Sorry you are not my owner😒."
-        )
 
-    parts = msg.text.split(None, 1)
-    if len(parts) < 2 or not parts[1].strip():
-        return await msg.reply_text(
-            "Welcome Boss To change your Api in your Repository in this format\n\n"
-            "/changeapi New Api Here\n**https... to .com/pw** tak Only😁.\n\n"
-            "Send me I will change it.✨"
-        )
-
-    new_api = parts[1].strip()
-    PWAPI1 = new_api
-    PWAPI2 = new_api
-    await msg.reply_text(
-        f" **💕𝐀𝐩𝐢 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 𝐂𝐡𝐚𝐧𝐠𝐞𝐝!**\n\n"
-        f"🔗 **𝐍𝐞𝐰 𝐀𝐩𝐢:**\n`{PWAPI1}`\n\n"
-        f"⚡ 𝐂𝐡𝐚𝐧𝐠𝐞𝐝 𝐋𝐢𝐯𝐞 𝐍𝐨𝐰 — 𝐍𝐨 𝐁𝐨𝐭 𝐫𝐞𝐬𝐭𝐚𝐫𝐭 𝐧𝐞𝐞𝐝𝐞𝐝 𝐔𝐬𝐞 𝐍𝐨𝐰🚀."
-    )
-
-#============================================================================================================
-
-
+bot.run()
 if __name__ == "__main__":
     asyncio.run(main())
