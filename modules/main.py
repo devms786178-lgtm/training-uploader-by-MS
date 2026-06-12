@@ -28,7 +28,7 @@ from pyrogram.types.messages_and_media import message
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 # ── Owner ID (update this with your actual owner Telegram ID) ────────────────
-OWNER_ID = int(os.environ.get("OWNER_ID", "0"))
+OWNER = int(os.environ.get("OWNER", "8446475678"))
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Live-changeable PW API endpoints (/changeapi command updates both) ───────
