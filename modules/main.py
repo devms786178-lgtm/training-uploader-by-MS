@@ -256,7 +256,7 @@ async def start(client: Client, msg: Message):
                 f"⬩➤**ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ ꜱᴇʀᴠɪᴄᴇ!**\n\n"
                 f"⬩➤**ɪ'ᴍ ʀɪᴄʜ ᴜᴘʟᴏᴀᴅᴇʀ ʙᴏᴛ**\n\n"
                 f"⬩➤**ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏꜱ & ᴘᴅꜰꜱ ꜰʀᴏᴍ ʏᴏᴜʀ ᴛᴇxᴛ ꜰɪʟᴇ ᴀɴᴅ ꜱᴇɴᴅ ᴛʜᴇᴍ ᴛᴏ ʏᴏᴜ.**\n\n"
-                f"⬩➤**ʟᴇᴛ'ꜱ ꜱᴛᴀʀᴛꜱ, ꜱᴇɴᴅ /Fury ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ᴍᴇ ʜᴜʀʀʏ📖.**\n\n"
+                f"⬩➤**ʟᴇᴛ'ꜱ ꜱᴛᴀʀᴛꜱ, ꜱᴇɴᴅ /Habibi ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ᴍᴇ ʜᴜʀʀʏ📖.**\n\n"
                 f"⬩➤**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ : @SmartBoy_ApnaMS 🗿**."
             )
         else:
@@ -395,7 +395,7 @@ async def changeapi_handler(client: Client, m: Message):
 
 # ══════════════════════════════════════════════════════════════════════════════
 
-@bot.on_message(filters.command(["Fury"]) )
+@bot.on_message(filters.command(["Habibi"]) )
 async def txt_handler(bot: Client, m: Message):
     # ── Auth Check ────────────────────────────────────────────────────────────
     if m.chat.id not in auth_users:
@@ -640,7 +640,7 @@ async def txt_handler(bot: Client, m: Message):
 
 # Advance
 
-@bot.on_message(filters.command(["Sobi"]) )
+@bot.on_message(filters.command(["notworking"]) )
 async def txt_handler(bot: Client, m: Message):
     # ── Auth Check ────────────────────────────────────────────────────────────
     if m.chat.id not in auth_users:
