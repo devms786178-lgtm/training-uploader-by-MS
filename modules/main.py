@@ -125,7 +125,7 @@ bot = Client(
     bot_token=BOT_TOKEN
 )
 
-my_name = "SK"
+my_name = "||_. @MR_Toxic_1 ._||"
 
 cookies_file_path = os.getenv("COOKIES_FILE_PATH", "/modules/youtube_cookies.txt")
 
@@ -143,7 +143,7 @@ async def web_server():
 
 async def start_bot():
     await bot.start()
-    print("Bot is up and running")
+    print("ʙᴏᴛ ɪꜱ ᴜᴘ ᴀɴᴅ ʀᴜɴɴɪɴɢ")
 
 async def stop_bot():
     await bot.stop()
@@ -155,7 +155,7 @@ async def main():
         await app_runner.setup()
         site = web.TCPSite(app_runner, "0.0.0.0", PORT)
         await site.start()
-        print(f"Web server started on port {PORT}")
+        print(f"ᴡᴇʙ ꜱᴇʀᴠᴇʀ ꜱᴛᴀʀᴛᴇᴅ ᴏɴ ᴘᴏʀᴛ {PORT}")
 
     # Start the bot
     await start_bot()
@@ -170,7 +170,7 @@ async def main():
 
 async def start_bot():
     await bot.start()
-    print("Bot is up and running")
+    print("ʙᴏᴛ ɪꜱ ᴜᴘ ᴀɴᴅ ʀᴜɴɴɪɴɢ")
 
 async def stop_bot():
     await bot.stop()
@@ -182,7 +182,7 @@ async def main():
         await app_runner.setup()
         site = web.TCPSite(app_runner, "0.0.0.0", PORT)
         await site.start()
-        print(f"Web server started on port {PORT}")
+        print(f"ᴡᴇʙ ꜱᴇʀᴠᴇʀ ꜱᴛᴀʀᴛᴇᴅ ᴏɴ ᴘᴏʀᴛ {PORT}")
 
     # Start the bot
     await start_bot()
@@ -196,7 +196,7 @@ async def main():
         
 class Data:
     START = (
-        "🌟 Welcome Darling 😘🙈 {0}! 🌟\n\n"
+        "🌟 ᴡᴇʟᴄᴏᴍᴇ ʜᴀʙɪʙɪ🤭 {0}! 🌟\n\n"
     )
 # Define the start command handler
 @bot.on_message(filters.command("start"))
@@ -211,36 +211,36 @@ async def start(client: Client, msg: Message):
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Initializing Uploader bot... 🤖\n\n"
-        "Progress: [⬜⬜⬜⬜⬜⬜⬜⬜⬜] 0%\n\n"
+        "ɪɴɪᴛɪᴀʟɪᴢɪɴɢ ᴜᴘʟᴏᴀᴅᴇʀ ʙᴏᴛ... 🤖\n\n"
+        "ᴘʀᴏɢʀᴇꜱꜱ: [⬜⬜⬜⬜⬜⬜⬜⬜⬜] 0%\n\n"
     )
 
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Loading features... ⏳\n\n"
-        "Progress: [🟥🟥🟥⬜⬜⬜⬜⬜⬜] 25%\n\n"
+        "ʟᴏᴀᴅɪɴɢ ꜰᴇᴀᴛᴜʀᴇꜱ... ⏳\n\n"
+        "ᴘʀᴏɢʀᴇꜱꜱ: [🟥🟥🟥⬜⬜⬜⬜⬜⬜] 25%\n\n"
     )
     
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "This may take a moment, sit back and relax! 🥵\n\n"
-        "Progress: [🟧🟧🟧🟧🟧⬜⬜⬜⬜] 50%\n\n"
+        "ᴛʜɪꜱ ᴍᴀʏ ᴛᴀᴋᴇ ᴀ ᴍᴏᴍᴇɴᴛ, ꜱɪᴛ ʙᴀᴄᴋ ᴀɴᴅ ʀᴇʟᴀx! 🥵\n\n"
+        "ᴘʀᴏɢʀᴇꜱꜱ: [🟧🟧🟧🟧🟧⬜⬜⬜⬜] 50%\n\n"
     )
 
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Checking Bot Status... 🔍\n\n"
-        "Progress: [🟨🟨🟨🟨🟨🟨🟨⬜⬜] 75%\n\n"
+        "ᴄʜᴇᴄᴋɪɴɢ ʙᴏᴛ ꜱᴛᴀᴛᴜꜱ... 🔍\n\n"
+        "ᴘʀᴏɢʀᴇꜱꜱ: [🟨🟨🟨🟨🟨🟨🟨⬜⬜] 75%\n\n"
     )
 
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "Checking status Okay... Command is Private Dear.🌚**Bot Made BY @SunilChoudhary08**🔍\n\n"
-        "Progress:[🟩🟩🟩🟩🟩🟩🟩🟩🟩] 100%\n\n"
+        "ʙᴏᴛ ꜱᴛᴀʀᴛᴇᴅ ʜᴀʙɪʙɪ... ᴄᴏᴍᴍᴀɴᴅ ɪꜱ ᴘʀɪᴠᴀᴛᴇ ᴅᴇᴀʀ.🌚**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ @JapaneseFury**🔍\n\n"
+        "ᴘʀᴏɢʀᴇꜱꜱ:[🟩🟩🟩🟩🟩🟩🟩🟩🟩] 100%\n\n"
     )
 
     # ── Register user for broadcast ───────────────────────────────────────────
@@ -252,19 +252,21 @@ async def start(client: Client, msg: Message):
     try:
         if msg.chat.id in auth_users:
             caption = (
-                f"🌚 𝐇𝐞𝐥𝐥𝐨 𝐁𝐚𝐛𝐲!\n\n"
-                f"⬩➤𝐈𝐦 𝐚 𝐀𝐝𝐚𝐯𝐚𝐧𝐜𝐞𝐝 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐁𝐨𝐭\n\n"
-                f"⬩➤𝐈 𝐂𝐚𝐧 𝐄𝐱𝐭𝐫𝐚𝐜𝐭 𝐕𝐢𝐝𝐞𝐨𝐬 & 𝐏𝐃𝐅𝐬 𝐅𝐫𝐨𝐦 𝐘𝐨𝐮𝐫 𝐓𝐞𝐱𝐭 𝐅𝐢𝐥𝐞 𝐚𝐧𝐝 𝐒𝐞𝐧𝐭 𝐭𝐨 𝐲𝐨𝐮!\n\n"
-                f"⬩➤𝐅𝐨𝐫 𝐆𝐮𝐢𝐝𝐞 𝐒𝐞𝐧𝐝 /The08 𝐜𝐨𝐦𝐦𝐚𝐧𝐝 📖\n\n"
-                f"⬩➤𝐌𝐚𝐝𝐞 𝐁𝐲 : @SmartBoy_ApnaMS 🗿."
+                f"⬩➤**🤭 ʜᴇʟʟᴏ ʜᴀʙɪʙɪ!**\n\n"
+                f"⬩➤**ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ ꜱᴇʀᴠɪᴄᴇ!**\n\n"
+                f"⬩➤**ɪ'ᴍ ʀɪᴄʜ ᴜᴘʟᴏᴀᴅᴇʀ ʙᴏᴛ**\n\n"
+                f"⬩➤**ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏꜱ & ᴘᴅꜰꜱ ꜰʀᴏᴍ ʏᴏᴜʀ ᴛᴇxᴛ ꜰɪʟᴇ ᴀɴᴅ ꜱᴇɴᴅ ᴛʜᴇᴍ ᴛᴏ ʏᴏᴜ.**\n\n"
+                f"⬩➤**ʟᴇᴛ'ꜱ ꜱᴛᴀʀᴛꜱ, ꜱᴇɴᴅ /Fury ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ᴍᴇ ʜᴜʀʀʏ📖.**\n\n"
+                f"⬩➤**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ : @SmartBoy_ApnaMS 🗿**."
             )
         else:
             caption = (
-                f"💘 𝐇𝐞𝐥𝐥𝐨 𝐖𝐞𝐥𝐜𝐨𝐦𝐞 **{msg.from_user.first_name}** !\n\n"
-                f"⬩➤𝐈𝐦 𝐚 𝐀𝐝𝐚𝐯𝐚𝐧𝐜𝐞𝐝 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐁𝐨𝐭\n\n"
-                f"⬩➤ 𝐈 𝐂𝐚𝐧 𝐄𝐱𝐭𝐫𝐚𝐜𝐭 𝐕𝐢𝐝𝐞𝐨𝐬 & 𝐏𝐃𝐅𝐬 𝐅𝐫𝐨𝐦 𝐘𝐨𝐮𝐫 𝐓𝐞𝐱𝐭 𝐅𝐢𝐥𝐞 𝐚𝐧𝐝 𝐒𝐞𝐧𝐭 𝐭𝐨 𝐲𝐨𝐮!\n\n"
-                f"⬩➤🆓𝐘𝐨𝐮 𝐚𝐫𝐞 𝐜𝐮𝐫𝐫𝐞𝐧𝐭𝐥𝐲 𝐮𝐬𝐢𝐧𝐠 𝐭𝐡𝐞 𝕗𝕣𝕖𝕖 𝐯𝐞𝐫𝐬𝐢𝐨𝐧!\n"
-                f"⬩➤𝐖𝐚𝐧𝐭 𝐏𝐫𝐞𝐦𝐢𝐮𝐦? 𝐂𝐨𝐧𝐭𝐚𝐜𝐭: @SmartBoy_ApnaMS 💎\n"
+                f"⬩➤**🤩ʜᴇʟʟᴏ** {msg.from_user.first_name} **ᴡᴇʟᴄᴏᴍᴇ ʜᴀʙɪʙɪ !**\n\n"
+                f"⬩➤**ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ ꜱᴇʀᴠɪᴄᴇ!**\n\n"
+                f"⬩➤**ɪ'ᴍ ʀɪᴄʜ ᴜᴘʟᴏᴀᴅᴇʀ ʙᴏᴛ\n\n"
+                f"⬩➤**ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏꜱ & ᴘᴅꜰꜱ ꜰʀᴏᴍ ʏᴏᴜʀ ᴛᴇxᴛ ꜰɪʟᴇ ᴀɴᴅ ꜱᴇɴᴅ ᴛʜᴇᴍ ᴛᴏ ʏᴏᴜ!**\n\n"
+                f"⬩➤**🆓 ʏᴏᴜ ᴀʀᴇ ᴄᴜʀʀᴇɴᴛʟʏ ᴜꜱɪɴɢ ᴀ 𝗳𝗿𝗲𝗲 ᴠᴇʀꜱɪᴏɴ!**\n"
+                f"⬩➤**ᴡᴀɴɴᴀ ᴀ ᴘʀᴇᴍɪᴜᴍ? ᴄᴏɴᴛᴀᴄᴛ:** @SmartBoy_ApnaMS 💎\n"
             )
         await client.send_photo(chat_id=msg.chat.id, photo=random.choice(image_list), caption=caption)
     except Exception:
@@ -273,7 +275,7 @@ async def start(client: Client, msg: Message):
 
 @bot.on_message(filters.command(["stop"]) )
 async def restart_handler(_, m):
-    await m.reply_text("♥️**STOPPED**♥️", True)
+    await m.reply_text("🎃**ꜱᴛᴏᴘᴘᴇᴅ**🎃", True)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 # ══════════════════════════════════════════════════════════════════════════════
