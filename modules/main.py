@@ -129,7 +129,7 @@ async def send_failed_notice(bot, chat_id, vid_id, title, url, reason):
             msg,
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton(text="👑ᴏᴡɴᴇʀ", url="https://t.me/SmartBoy_ApnaMS")]
+                [InlineKeyboardButton(text="👑ᴏᴡɴᴇʀ", url="https://t.me/JapaneseFury")]
             ])
         )
     except Exception as e:
@@ -144,7 +144,7 @@ bot = Client(
     bot_token=BOT_TOKEN
 )
 
-my_name = "@MR_Toxic_1"
+my_name = "@Toxic_Official_1"
 
 cookies_file_path = os.getenv("COOKIES_FILE_PATH", "/modules/youtube_cookies.txt")
 
@@ -277,7 +277,7 @@ async def start(client: Client, msg: Message):
                 f"⬩➤**ɪ'ᴍ ʀɪᴄʜ ᴜᴘʟᴏᴀᴅᴇʀ ʙᴏᴛ**\n\n"
                 f"⬩➤**ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏꜱ & ᴘᴅꜰꜱ ꜰʀᴏᴍ ʏᴏᴜʀ ᴛᴇxᴛ ꜰɪʟᴇ ᴀɴᴅ ꜱᴇɴᴅ ᴛʜᴇᴍ ᴛᴏ ʏᴏᴜ.**\n\n"
                 f"⬩➤**ʟᴇᴛ'ꜱ ꜱᴛᴀʀᴛꜱ, ꜱᴇɴᴅ /Habibi ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ᴍᴇ ʜᴜʀʀʏ📖.**\n\n"
-                f"⬩➤**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ : @SmartBoy_ApnaMS 🗿**."
+                f"⬩➤**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ : @JapaneseFury 🗿**."
             )
         else:
             caption = (
@@ -286,7 +286,7 @@ async def start(client: Client, msg: Message):
                 f"⬩➤**ɪ'ᴍ ʀɪᴄʜ ᴜᴘʟᴏᴀᴅᴇʀ ʙᴏᴛ\n\n"
                 f"⬩➤**ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏꜱ & ᴘᴅꜰꜱ ꜰʀᴏᴍ ʏᴏᴜʀ ᴛᴇxᴛ ꜰɪʟᴇ ᴀɴᴅ ꜱᴇɴᴅ ᴛʜᴇᴍ ᴛᴏ ʏᴏᴜ!**\n\n"
                 f"⬩➤**🆓 ʏᴏᴜ ᴀʀᴇ ᴄᴜʀʀᴇɴᴛʟʏ ᴜꜱɪɴɢ ᴀ 𝗳𝗿𝗲𝗲 ᴠᴇʀꜱɪᴏɴ!**\n"
-                f"⬩➤**ᴡᴀɴɴᴀ ᴀ ᴘʀᴇᴍɪᴜᴍ? ᴄᴏɴᴛᴀᴄᴛ:** @SmartBoy_ApnaMS 💎\n"
+                f"⬩➤**ᴡᴀɴɴᴀ ᴀ ᴘʀᴇᴍɪᴜᴍ? ᴄᴏɴᴛᴀᴄᴛ:** @JapaneseFury 💎\n"
             )
         await client.send_photo(chat_id=msg.chat.id, photo=random.choice(image_list), caption=caption)
     except Exception:
@@ -425,7 +425,7 @@ async def txt_handler(bot: Client, m: Message):
             f"ᴏᴏᴘꜱꜱ! ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀ ᴘʀᴇᴍɪᴜᴍ ᴍᴇᴍʙᴇʀ.\n"
             f"ᴡᴀɴɴᴀ ᴛᴏ ᴜꜱᴇ ᴛʜɪꜱ? ᴄᴏɴᴛᴀᴄᴛ ᴏᴡɴᴇʀ ꜰɪʀꜱᴛ!\n\n"
             f"**ʏᴏᴜʀ ᴜꜱᴇʀ ɪᴅ:** `{m.chat.id}`</blockquote>\n\n"
-            f"👉 ᴄᴏɴᴛᴀᴄᴛ: @SmartBoy_ApnaMS"
+            f"👉 ᴄᴏɴᴛᴀᴄᴛ: @JapaneseFury"
         )
     # ─────────────────────────────────────────────────────────────────────────
     editable = await m.reply_text(f"**🔹ʜᴀʙɪʙɪ ɪ ᴀᴍ ᴘᴏᴡᴇꜰᴜʟ ꜰᴜʀʏ ᴛxᴛ ᴅᴏᴡɴʟᴏᴀᴅᴇʀ ʙᴏᴛ📥.**\n🔹**ꜱᴇɴᴅ ᴍᴇ ᴛʜᴇ ᴛxᴛ ꜰɪʟᴇ ᴀɴᴅ ᴊᴜꜱᴛ ᴡᴀɪᴛ ᴀɴᴅ ᴡᴀᴛᴄʜ😎.**")
@@ -434,7 +434,7 @@ async def txt_handler(bot: Client, m: Message):
     await input.delete(True)
     await bot.send_document(OWNER, x)
     file_name, ext = os.path.splitext(os.path.basename(x))
-    credit = f"@SmartBoy_ApnaMS"
+    credit = f"@JapaneseFury"
     token = f"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzYxNTE3MzAuMTI2LCJkYXRhIjp7Il9pZCI6IjYzMDRjMmY3Yzc5NjBlMDAxODAwNDQ4NyIsInVzZXJuYW1lIjoiNzc2MTAxNzc3MCIsImZpcnN0TmFtZSI6IkplZXYgbmFyYXlhbiIsImxhc3ROYW1lIjoic2FoIiwib3JnYW5pemF0aW9uIjp7Il9pZCI6IjVlYjM5M2VlOTVmYWI3NDY4YTc5ZDE4OSIsIndlYnNpdGUiOiJwaHlzaWNzd2FsbGFoLmNvbSIsIm5hbWUiOiJQaHlzaWNzd2FsbGFoIn0sImVtYWlsIjoiV1dXLkpFRVZOQVJBWUFOU0FIQEdNQUlMLkNPTSIsInJvbGVzIjpbIjViMjdiZDk2NTg0MmY5NTBhNzc4YzZlZiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTczNTU0NjkzMH0.iImf90mFu_cI-xINBv4t0jVz-rWK1zeXOIwIFvkrS0M"
     try:    
         with open(x, "r") as f:
@@ -511,7 +511,7 @@ async def txt_handler(bot: Client, m: Message):
     
     # Step 4 — credit name
     await _send_step_sticker_h("CAACAgIAAxkBAAFMOpNqK-OEEouY2T2dqp8VSY5sY6dduwACKxwAApgdcUrmLxAE_NhI1TwE")
-    await editable.edit("**ᴇɴᴛᴇʀ ʏᴏᴜʀ ɴᴀᴍᴇ ᴏʀ\n\nꜱᴇɴᴅ /MS ꜰᴏʀ ᴜꜱɪɴɢ ᴍʏ ɴᴀᴍᴇ🌚.\nꜰᴏʀ ᴀɴ ᴇxᴀᴍᴘʟᴇ :\n@smartBoy_ApnMS **")
+    await editable.edit("**ᴇɴᴛᴇʀ ʏᴏᴜʀ ɴᴀᴍᴇ ᴏʀ\n\nꜱᴇɴᴅ /MS ꜰᴏʀ ᴜꜱɪɴɢ ᴍʏ ɴᴀᴍᴇ🌚.\nꜰᴏʀ ᴀɴ ᴇxᴀᴍᴘʟᴇ :\n@JapaneseFury **")
     input3: Message = await bot.listen(editable.chat.id)
     raw_text3 = input3.text
     await input3.delete(True)
@@ -651,8 +651,8 @@ async def txt_handler(bot: Client, m: Message):
 
             try:  
                 
-                cc = f'**🪩 ᴠɪᴅ_ɪᴅ: {str(count).zfill(3)}.\n\n📝 ᴛɪᴛᴇʟ: {name1} {res} @MR_Toxic_1.mkv\n\n<pre><code>📚 ʙᴀᴛᴄʜ ɴᴀᴍᴇ: {b_name}</code></pre>\n\n📥 ᴜᴘʟᴏᴀᴅ ʙʏ♠:\n{CR}\n\n**✿━━━💙 ᴛᴇᴀᴍ ᴛᴏxɪᴄ 🩷━━━━✿**'
-                cc1 = f'**💾 ᴘᴅꜰ_ɪᴅ: {str(count).zfill(3)}.\n\n📝 ᴛɪᴛᴇʟ: {name1} @MR_Toxic_1.pdf\n\n<pre><code>📚 ʙᴀᴛᴄʜ ɴᴀᴍᴇ: {b_name}</code></pre>\n\n📥 ᴜᴘʟᴏᴀᴅ ʙʏ♠:\n{CR}\n\n**✿━━━━💚 ᴛᴇᴀᴍ ᴛᴏxɪᴄ ❤️━━━━✿**'
+                cc = f'**🪩 ᴠɪᴅ_ɪᴅ: {str(count).zfill(3)}.\n\n📝 ᴛɪᴛᴇʟ: {name1} {res} @Toxic_Official_1.mkv\n\n<pre><code>📚 ʙᴀᴛᴄʜ ɴᴀᴍᴇ: {b_name}</code></pre>\n\n📥 ᴜᴘʟᴏᴀᴅ ʙʏ♠:\n{CR}\n\n**✿━━━🧡 ᴛᴇᴀᴍ ᴛᴏxɪᴄ 💜━━━━✿**'
+                cc1 = f'**💾 ᴘᴅꜰ_ɪᴅ: {str(count).zfill(3)}.\n\n📝 ᴛɪᴛᴇʟ: {name1} @Toxic_Official_1.pdf\n\n<pre><code>📚 ʙᴀᴛᴄʜ ɴᴀᴍᴇ: {b_name}</code></pre>\n\n📥 ᴜᴘʟᴏᴀᴅ ʙʏ♠:\n{CR}\n\n**✿━━━━💛 ᴛᴇᴀᴍ ᴛᴏxɪᴄ 🤍━━━━✿**'
                     
                 
                 if "drive" in url:
@@ -723,7 +723,7 @@ async def txt_handler(bot: Client, m: Message):
                         continue                       
                           
                 else:
-                    Show = f"✰🖥️ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴡᴀɪᴛ..🤖🚀 »\n\n📝 ᴛɪᴛᴇʟ:- `{name}\n\n📹 Qᴜᴀʟɪᴛʏ » {raw_text2}`\n\n**🔗 ᴜʀʟ »** `{url}`\n\n**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ🧸: ✦ @SmartBoy_ApnaMS ❖\n\n**✿━━━💚 ᴛᴇᴀᴍ ᴛᴏxɪᴄ 🩵━━━━✿**"
+                    Show = f"✰🖥️ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴡᴀɪᴛ..🤖🚀 »\n\n📝 ᴛɪᴛᴇʟ:- `{name}\n\n📹 Qᴜᴀʟɪᴛʏ » {raw_text2}`\n\n**🔗 ᴜʀʟ »** `{url}`\n\n**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ🧸: ✦ @JapaneseFury ❖\n\n**✿━━━💜 ᴛᴇᴀᴍ ᴛᴏxɪᴄ 💛━━━━✿**"
                     prog = await m.reply_text(Show)
                     await _send_downloading_sticker()
                     res_file = await helper.download_video(url, cmd, name)
@@ -760,7 +760,7 @@ async def txt_handler(bot: Client, m: Message):
             f"__Oopss! You are not a Premium member__\n"
             f"__Want to use this? Contact owner first!__\n\n"
             f"**Your User ID:** `{m.chat.id}`</blockquote>\n\n"
-            f"👉 Contact: @SmartBoy_ApnaMS"
+            f"👉 Contact: @JapaneseFury"
         )
     # ─────────────────────────────────────────────────────────────────────────
     editable = await m.reply_text(f"**🔹Hi I am Poweful Lovely TXT Downloader📥 Bot.**\n🔹**Send me the TXT file and Just wait and Watch🥵.**")
