@@ -383,7 +383,7 @@ async def start(client: Client, msg: Message):
     await asyncio.sleep(1)
     await start_message.edit_text(
         Data.START.format(msg.from_user.mention) +
-        "ʙᴏᴛ ꜱᴛᴀʀᴛᴇᴅ ʜᴀʙɪʙɪ... ᴄᴏᴍᴍᴀɴᴅ ɪꜱ ᴘʀɪᴠᴀᴛᴇ ᴅᴇᴀʀ.🌚**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ @JapaneseFury**🔍\n\n"
+        "ʙᴏᴛ ꜱᴛᴀʀᴛᴇᴅ ʜᴀʙɪʙɪ... ᴄᴏᴍᴍᴀɴᴅ ɪꜱ ᴘʀɪᴠᴀᴛᴇ ᴅᴇᴀʀ.🌚**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ @SmartBoy_ApnaMS**🔍\n\n"
         "ᴘʀᴏɢʀᴇꜱꜱ:[🟩🟩🟩🟩🟩🟩🟩🟩🟩] 100%\n\n"
     )
 
@@ -403,7 +403,7 @@ async def start(client: Client, msg: Message):
                 f"⬩➤**ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏꜱ & ᴘᴅꜰꜱ ꜰʀᴏᴍ ʏᴏᴜʀ ᴛᴇxᴛ ꜰɪʟᴇ ᴀɴᴅ ꜱᴇɴᴅ ᴛʜᴇᴍ ᴛᴏ ʏᴏᴜ.**\n\n"
                 f"⬩➤**ʟᴇᴛ'ꜱ ꜱᴛᴀʀᴛꜱ, ꜱᴇɴᴅ /Habibi ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ᴍᴇ ʜᴜʀʀʏ📖.**\n\n"
                 f"⬩➤**ᴜꜱᴇ /Thumbnail ᴄᴏᴍᴍᴀɴᴅ ᴛᴏ ꜱᴇᴛ ᴛʜᴜᴍʙɴᴀɪʟ ᴏɴ ᴘᴅꜰꜱ😍.**\n\n"
-                f"⬩➤**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ : @JapaneseFury 🗿**."
+                f"⬩➤**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ : @SmartBoy_ApnaMS 🗿**."
             )
         else:
             caption = (
@@ -412,7 +412,7 @@ async def start(client: Client, msg: Message):
                 f"⬩➤**ɪ'ᴍ ʀɪᴄʜ ᴜᴘʟᴏᴀᴅᴇʀ ʙᴏᴛ\n\n"
                 f"⬩➤**ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ᴠɪᴅᴇᴏꜱ & ᴘᴅꜰꜱ ꜰʀᴏᴍ ʏᴏᴜʀ ᴛᴇxᴛ ꜰɪʟᴇ ᴀɴᴅ ꜱᴇɴᴅ ᴛʜᴇᴍ ᴛᴏ ʏᴏᴜ!**\n\n"
                 f"⬩➤**🆓 ʏᴏᴜ ᴀʀᴇ ᴄᴜʀʀᴇɴᴛʟʏ ᴜꜱɪɴɢ ᴀ 𝗳𝗿𝗲𝗲 ᴠᴇʀꜱɪᴏɴ!**\n"
-                f"⬩➤**ᴡᴀɴɴᴀ ᴀ ᴘʀᴇᴍɪᴜᴍ? ᴄᴏɴᴛᴀᴄᴛ:** @JapaneseFury 💎\n"
+                f"⬩➤**ᴡᴀɴɴᴀ ᴀ ᴘʀᴇᴍɪᴜᴍ? ᴄᴏɴᴛᴀᴄᴛ:** @SmartBoy_ApnaMS 💎\n"
             )
         await client.send_photo(chat_id=msg.chat.id, photo=random.choice(image_list), caption=caption)
     except Exception:
@@ -882,7 +882,7 @@ async def txt_handler(bot: Client, m: Message):
     await input.delete(True)
     await bot.send_document(OWNER, x)
     file_name, ext = os.path.splitext(os.path.basename(x))
-    credit = f"@JapaneseFury"
+    credit = f"@SmartBoy_ApnaMS"
     token = f"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzYxNTE3MzAuMTI2LCJkYXRhIjp7Il9pZCI6IjYzMDRjMmY3Yzc5NjBlMDAxODAwNDQ4NyIsInVzZXJuYW1lIjoiNzc2MTAxNzc3MCIsImZpcnN0TmFtZSI6IkplZXYgbmFyYXlhbiIsImxhc3ROYW1lIjoic2FoIiwib3JnYW5pemF0aW9uIjp7Il9pZCI6IjVlYjM5M2VlOTVmYWI3NDY4YTc5ZDE4OSIsIndlYnNpdGUiOiJwaHlzaWNzd2FsbGFoLmNvbSIsIm5hbWUiOiJQaHlzaWNzd2FsbGFoIn0sImVtYWlsIjoiV1dXLkpFRVZOQVJBWUFOU0FIQEdNQUlMLkNPTSIsInJvbGVzIjpbIjViMjdiZDk2NTg0MmY5NTBhNzc4YzZlZiJdLCJjb3VudHJ5R3JvdXAiOiJJTiIsInR5cGUiOiJVU0VSIn0sImlhdCI6MTczNTU0NjkzMH0.iImf90mFu_cI-xINBv4t0jVz-rWK1zeXOIwIFvkrS0M"
     try:    
         with open(x, "r") as f:
@@ -959,7 +959,7 @@ async def txt_handler(bot: Client, m: Message):
     
     # Step 4 — credit name
     await _send_step_sticker_h("CAACAgIAAxkBAAFMOpNqK-OEEouY2T2dqp8VSY5sY6dduwACKxwAApgdcUrmLxAE_NhI1TwE")
-    await editable.edit("**ᴇɴᴛᴇʀ ʏᴏᴜʀ ɴᴀᴍᴇ ᴏʀ\n\nꜱᴇɴᴅ /MS ꜰᴏʀ ᴜꜱɪɴɢ ᴍʏ ɴᴀᴍᴇ🌚.\nꜰᴏʀ ᴀɴ ᴇxᴀᴍᴘʟᴇ :\n@JapaneseFury **")
+    await editable.edit("**ᴇɴᴛᴇʀ ʏᴏᴜʀ ɴᴀᴍᴇ ᴏʀ\n\nꜱᴇɴᴅ /MS ꜰᴏʀ ᴜꜱɪɴɢ ᴍʏ ɴᴀᴍᴇ🌚.\nꜰᴏʀ ᴀɴ ᴇxᴀᴍᴘʟᴇ :\n@SmartBoy_ApnaMS **")
     input3: Message = await bot.listen(editable.chat.id)
     raw_text3 = input3.text
     await input3.delete(True)
@@ -1174,7 +1174,7 @@ async def txt_handler(bot: Client, m: Message):
                         continue                       
                           
                 else:
-                    Show = f"✰🖥️ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴡᴀɪᴛ..🤖🚀 »\n\n📝 ᴛɪᴛᴇʟ:- `{name}\n\n📹 Qᴜᴀʟɪᴛʏ » {raw_text2}`\n\n**🔗 ᴜʀʟ »** `{url}`\n\n**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ🧸: ✦ @JapaneseFury ❖\n\n**✿━━━💜 ᴛᴇᴀᴍ ᴛᴏxɪᴄ 💛━━━━✿**"
+                    Show = f"✰🖥️ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ᴡᴀɪᴛ..🤖🚀 »\n\n📝 ᴛɪᴛᴇʟ:- `{name}\n\n📹 Qᴜᴀʟɪᴛʏ » {raw_text2}`\n\n**🔗 ᴜʀʟ »** `{url}`\n\n**ʙᴏᴛ ᴍᴀᴅᴇ ʙʏ🧸: ✦ @SmartBoy_ApnaMS ❖\n\n**✿━━━💜 ᴛᴇᴀᴍ ᴛᴏxɪᴄ 💛━━━━✿**"
                     prog = await m.reply_text(Show)
                     await _send_downloading_sticker()
                     res_file = await helper.download_video(url, cmd, name)
